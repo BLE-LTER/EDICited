@@ -1,16 +1,31 @@
 # retrieve citations from datacite REST API
 
+#' Title
+#'
+#' @param relationship_child
+#' @param citation_type
+#' @param citations_list
+#' @param clean_identifier
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_citations_from_relationships <-
   function(relationship_child,
            citation_type,
            citations_list,
            clean_identifier) {
     if ('data' %in% names(relationship_child)) {
-      for (item in relationship_child$data) {
-        if ('id' %in% names(item)) {
+      # this is a df too instead of a list
+      # so this deviates a bit from the python
+      df <- relationship_child$data
+      if (class(df) != "data.frame") df <- as.data.frame(df)
+      for (row in seq_len(nrow(df))) {
+        if ('id' %in% colnames(df)) {
           # make sure we dont already have this citation by checking the identifier
           found <- FALSE
-          identifier <- clean_identifier(item$id)
+          identifier <- clean_identifier(df[row, 'id'])
           for (citation in citations_list) {
             if (citation$identifier == identifier) {
               found <- TRUE
@@ -22,16 +37,16 @@ add_citations_from_relationships <-
 
           citation <- list()
           citation$identifier <- identifier
-          if ('type' %in% names(item)) {
-            if (item$type == 'dois')
+          if ('type' %in% colnames(df)) {
+            if (df[row, 'type'] == 'dois')
               citation$identifier_type <- 'DOI'
             else
-              citation$identifier_type <- item$type
+              citation$identifier_type <- df[row, 'type']
           }
           else
             citation$identifier_type <- 'Unknown'
           citation$type <- citation_type
-          citations_list <- c(citations_list, citation)
+          citations_list <- c(citations_list, list(citation))
         }
       }
     }
@@ -59,7 +74,6 @@ get_citations_for_doi <- function(doi) {
   doi <- clean_identifier(doi)
   citations <- c()
   url <- paste0('https://api.datacite.org/dois/', doi)
-  response <- NULL
   tryCatch(expr = {
     response <- jsonlite::fromJSON(url)
   }, error = function(e){
@@ -74,24 +88,28 @@ get_citations_for_doi <- function(doi) {
       # get citations from relatedIdentifiers
       if ('attributes' %in% names(response_json$data)) {
         if ('relatedIdentifiers' %in% names(response_json$data$attributes)) {
-          for (item in response_json$data$attributes$relatedIdentifiers) {
-            if ('relatedIdentifier' %in% names(item)) {
+          # related identifiers is a data frame not a list
+          # so this deviates from the python a little bit
+          relid_df <- response_json$data$attributes$relatedIdentifiers
+          if (class(relid_df) != "data.frame") relid_df <- as.data.frame(relid_df)
+          for (row in seq_len(nrow(relid_df))) {
+            if ('relatedIdentifier' %in% colnames(relid_df)) {
               citation <- list()
               citation$identifier <-
-                clean_identifier(item$relatedIdentifier)
-              if ('relationType' %in% names(item)) {
-                if (item$relationType == 'IsIdenticalTo') {
+                clean_identifier(relid_df[row, 'relatedIdentifier'])
+              if ('relationType' %in% names(relid_df)) {
+                if (relid_df[row, 'relationType'] == 'IsIdenticalTo') {
                   # skip this citation
                   next()
                 }
-                citation$type <- item$relationType
+                citation$type <- relid_df[row, 'relationType']
               } else
                 citation$type <- "Unknown"
-              if ('relatedIdentifierType' %in% names(item)) {
-                citation$identifier_type <- item$relatedIdentifierType
+              if ('relatedIdentifierType' %in% colnames(relid_df)) {
+                citation$identifier_type <- relid_df[row, 'relatedIdentifierType']
               } else
                 citation$identifier_type <- "Unknown"
-              citations <- c(citations, citation)
+              citations <- c(citations, list(citation))
             }
           }
         }
@@ -129,7 +147,8 @@ get_citations_for_doi <- function(doi) {
     }
 
     # remove published preprints
-    citations <- remove_published_preprints(citations)
+    #citations <- remove_published_preprints(citations)
+    #print(citations)
     return(citations)
   } else stop()
 }

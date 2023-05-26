@@ -9,21 +9,23 @@
 #'
 #' @examples
 create_citation_table <- function(scope, file = NULL, standalone_dois = NULL, meta= NULL) {
-  df <- data.frame(scope = c(),
-                   id = c(),
-                   revision = c(),
-                   pubdate = c(),
-                   title = c(),
-                   creators = c(),
-                   doi = c(),
-                   citation = c())
+  cols <- c('scope', 'id',
+            'revision',
+            'pubdate',
+            'title',
+            'creators',
+            'doi',
+            'citation')
+  df <- data.frame(matrix(nrow = 0, ncol = length(cols)))
+  colnames(df) <- cols
+  #print(df)
   if (is.null(meta)) meta <- get_meta_for_all_items_in_scope(scope)
   for (i in seq_along(meta)) {
     for (item in meta[[i]]) {
       message(paste0('Getting citations for ', scope, '.', i, '.', item$revision, ' ...'))
       citations <- get_citations_for_doi(item$doi)
-      for (citation in citations) {
-        df[nrow(df) + 1, ] <- c(scope, meta[[i]], item$revision, item$pubDate, item$title, item$creator, item$doi, citation$citation)
+      for (citation in seq_along(citations)) {
+        df[nrow(df) + 1, ] <- c(scope, i, item$revision, item$pubDate, item$title, item$creator, item$doi, citations[[citation]]$identifier)
       }
     }
   }
