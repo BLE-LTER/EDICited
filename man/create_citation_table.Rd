@@ -2,16 +2,22 @@
 % Please edit documentation in R/create_citation_table.R
 \name{create_citation_table}
 \alias{create_citation_table}
-\title{Title}
+\title{Create a table of citations from an EDI scope (aka for all datasets under a LTER site)}
 \usage{
 create_citation_table(scope, file = NULL, standalone_dois = NULL, meta = NULL)
 }
 \arguments{
-\item{standalone_dois}{}
+\item{scope}{(character) Example "knb-lter-ble"}
+
+\item{file}{(character) File path to save CSV at. Defaults to NULL, in which case only a R data.frame is returned}
+
+\item{standalone_dois}{(character) Character vector of standalone dataset DOIs to look up}
+
+\item{meta}{(list) List object, output from get_meta_for_all_items_in_scope. Used in debugging case where you don't want to get the metadata from the scope every time this function is called, which can be a lengthy process.}
 }
 \value{
-
+(data.frame) Table of datasets and DOIs that cite them
 }
 \description{
-Title
+Create a table of citations from an EDI scope (aka for all datasets under a LTER site)
 }

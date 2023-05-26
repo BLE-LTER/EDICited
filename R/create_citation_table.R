@@ -1,10 +1,11 @@
-#' Title
+#' Create a table of citations from an EDI scope (aka for all datasets under a LTER site)
 #'
-#' @param scope
-#' @param file
-#' @param standalone_dois
+#' @param scope (character) Example "knb-lter-ble"
+#' @param file (character) File path to save CSV at. Defaults to NULL, in which case only a R data.frame is returned
+#' @param standalone_dois (character) Character vector of standalone dataset DOIs to look up
+#' @param meta (list) List object, output from get_meta_for_all_items_in_scope. Used in debugging case where you don't want to get the metadata from the scope every time this function is called, which can be a lengthy process.
 #'
-#' @return
+#' @return (data.frame) Table of datasets and DOIs that cite them
 #' @export
 #'
 #' @examples
