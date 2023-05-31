@@ -1,19 +1,24 @@
 get_citation_for_doi <- function(doi) {
   url <- paste0('https://api.crossref.org/works/', doi)
-  response <- httr::GET(url)
+  tryCatch(expr = {
+    response <- jsonlite::fromJSON(url)
+  }, error = function(e){
+    message(paste0('CrossRef API call failed for DOI: ', doi, 'Error: ', e))
+  })
   citation <- list()
 
-  if (response$status_code == 200) {
+  if (!is.null(response)) {
     data <- response$message
     citation$doi <- doi
 
     # The author names are in the 'family' field if present, otherwise use the 'name' field
     authors <- c()
-    for (i in seq_along(data$author)) {
-      if ('family' %in% names(author)) {
-        authors <- c(authors, author$family)
-      } else if ('name' %in% names(author)) {
-        authors <- c(authors, author$name)
+    author_df <- data$author
+    for (i in seq_along(nrow(author_df))) {
+      if ('family' %in% colnames(author_df)) {
+        authors <- c(authors, author_df[i, 'family'])
+      } else if ('name' %in% colnames(author_df)) {
+        authors <- c(authors, author_df[i, 'name'])
       } else
         stop("Error: author name not found")
     }
