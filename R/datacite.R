@@ -58,19 +58,26 @@ remove_published_preprints <- function(citations) {
   preprints <- c()
   for (citation in citations) {
     for (preprint in citations$preprints) {
-      preprints <- c(preprints, preprint)
+      preprints <- c(preprints, list(preprint))
     }
   }
 
   for (citation in citations) {
     if (!citation$identifier %in% preprints)
-      result <- c(result, citation)
+      result <- c(result, list(citation))
   }
   return(result)
 }
 
-get_citations_for_doi <- function(doi) {
-  # list of ciations, where each citation is a dictionary
+#' Get DataCite citations for EDI data packages
+#'
+#' @param doi (character) One DOI string from EDI data package to lookup citations for
+#' @param remove_preprints (logical) TRUE/FALSE on whether to remove published preprints. Defaults to FALSE.
+#'
+#' @return (list) Unnamed list of citations found in DataCite
+#' @export
+get_citations_for_doi <- function(doi, remove_preprints = FALSE) {
+  # list of citations, where each citation is a dictionary
   doi <- clean_identifier(doi)
   citations <- c()
   url <- paste0('https://api.datacite.org/dois/', doi)
@@ -147,7 +154,9 @@ get_citations_for_doi <- function(doi) {
     }
 
     # remove published preprints
-    #citations <- remove_published_preprints(citations)
+    if (remove_preprints) {
+        citations <- remove_published_preprints(citations)
+    }
     #print(citations)
     return(citations)
   } else stop()
