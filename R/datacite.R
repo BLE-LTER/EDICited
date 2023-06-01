@@ -131,19 +131,19 @@ get_citations_for_doi <- function(doi) {
     }
 
     # for each citation, get the author, title, andyear to build citation text
-    for (citation in citations) {
-      citation$crossref_data <- NULL
-      if (citation$identifier_type == 'DOI') {
+    for (i in seq_along(citations)) {
+      citations[[i]]$crossref_data <- NULL
+      if (citations[[i]]$identifier_type == 'DOI') {
         tryCatch({
-          crossref_citation <- get_citation_for_doi(citation$identifier)
-          citation$citation <- crossref_citation$citation
-          citation$preprints <- crossref_citation$preprints
+          crossref_citation <- get_citation_for_doi(citations[[i]]$identifier)
+          citations[[i]]$citation <- crossref_citation$citation
+          citations[[i]]$preprints <- crossref_citation$preprints
         },
         error = function(e) {
           message(e)
-          citation$citation <- ''
+          citations[[i]]$citation <- ''
         })
-      } else citation$citation <- ''
+      } else citations[[i]]$citation <- ''
     }
 
     # remove published preprints

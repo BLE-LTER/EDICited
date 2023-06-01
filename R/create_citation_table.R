@@ -25,8 +25,8 @@ create_citation_table <- function(scope, file = NULL, standalone_dois = NULL, me
     for (item in meta[[i]]) {
       message(paste0('Getting citations for ', scope, '.', i, '.', item$revision, ' ...'))
       citations <- get_citations_for_doi(item$doi)
-      for (citation in seq_along(citations)) {
-        df[nrow(df) + 1, ] <- c(scope, i, item$revision, item$pubDate, item$title, item$creator, item$doi, citations[[citation]]$identifier)
+      for (j in seq_along(citations)) {
+        df[nrow(df) + 1, ] <- c(scope, i, item$revision, item$pubDate, item$title, item$creator, item$doi, citations[[j]]$citation)
       }
     }
   }
