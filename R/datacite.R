@@ -58,26 +58,19 @@ remove_published_preprints <- function(citations) {
   preprints <- c()
   for (citation in citations) {
     for (preprint in citations$preprints) {
-      preprints <- c(preprints, list(preprint))
+      preprints <- c(preprints, preprint)
     }
   }
 
   for (citation in citations) {
     if (!citation$identifier %in% preprints)
-      result <- c(result, list(citation))
+      result <- c(result, citation)
   }
   return(result)
 }
 
-#' Get DataCite citations for EDI data packages
-#'
-#' @param doi (character) One DOI string from EDI data package to lookup citations for
-#' @param remove_preprints (logical) TRUE/FALSE on whether to remove published preprints. Defaults to FALSE.
-#'
-#' @return (list) Unnamed list of citations found in DataCite
-#' @export
-get_citations_for_doi <- function(doi, remove_preprints = FALSE) {
-  # list of citations, where each citation is a dictionary
+get_citations_for_doi <- function(doi) {
+  # list of ciations, where each citation is a dictionary
   doi <- clean_identifier(doi)
   citations <- c()
   url <- paste0('https://api.datacite.org/dois/', doi)
@@ -138,25 +131,23 @@ get_citations_for_doi <- function(doi, remove_preprints = FALSE) {
     }
 
     # for each citation, get the author, title, andyear to build citation text
-    for (i in seq_along(citations)) {
-      citations[[i]]$crossref_data <- NULL
-      if (citations[[i]]$identifier_type == 'DOI') {
+    for (citation in citations) {
+      citation$crossref_data <- NULL
+      if (citation$identifier_type == 'DOI') {
         tryCatch({
-          crossref_citation <- get_citation_for_doi(citations[[i]]$identifier)
-          citations[[i]]$citation <- crossref_citation$citation
-          citations[[i]]$preprints <- crossref_citation$preprints
+          crossref_citation <- get_citation_for_doi(citation$identifier)
+          citation$citation <- crossref_citation$citation
+          citation$preprints <- crossref_citation$preprints
         },
         error = function(e) {
           message(e)
-          citations[[i]]$citation <- ''
+          citation$citation <- ''
         })
-      } else citations[[i]]$citation <- ''
+      } else citation$citation <- ''
     }
 
     # remove published preprints
-    if (remove_preprints) {
-        citations <- remove_published_preprints(citations)
-    }
+    #citations <- remove_published_preprints(citations)
     #print(citations)
     return(citations)
   } else stop()

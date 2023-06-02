@@ -4,13 +4,7 @@
 \alias{create_citation_table}
 \title{Create a table of citations from an EDI scope (aka for all datasets under a LTER site)}
 \usage{
-create_citation_table(
-  scope,
-  file = NULL,
-  standalone_dois = NULL,
-  meta = NULL,
-  remove_preprints = FALSE
-)
+create_citation_table(scope, file = NULL, standalone_dois = NULL, meta = NULL)
 }
 \arguments{
 \item{scope}{(character) Example "knb-lter-ble"}
@@ -20,8 +14,6 @@ create_citation_table(
 \item{standalone_dois}{(character) Character vector of standalone dataset DOIs to look up}
 
 \item{meta}{(list) List object, output from get_meta_for_all_items_in_scope. Used in debugging case where you don't want to get the metadata from the scope every time this function is called, which can be a lengthy process.}
-
-\item{remove_preprints}{(logical) TRUE/FALSE on whether to remove published preprints. Defaults to FALSE.}
 }
 \value{
 (data.frame) Table of datasets and DOIs that cite them

@@ -39,11 +39,11 @@ get_citation_for_doi <- function(doi) {
 
     # # Add preprint if present, to help spot them later if the client wants to filter out preprints
     preprints <- c()
-    if ('relation' %in% names(data) & length(data$relation) > 0) {
+    if ('relation' %in% names(data)) {
       if ('has-preprint' %in% names(data$relation)) {
-        for (i in seq_along(nrow(data$relation[['has-preprint']]))) {
+        for (i in seq_along(data$relation[['has-preprint']])) {
           preprints <-
-            c(preprints, clean_identifier(data$relation[["has-preprint"]][i, 'id']))
+            c(preprints, clean_identifier(data$relation[["has-preprint"]][[i]]$id))
         }
       }
     }

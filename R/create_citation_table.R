@@ -4,13 +4,12 @@
 #' @param file (character) File path to save CSV at. Defaults to NULL, in which case only a R data.frame is returned
 #' @param standalone_dois (character) Character vector of standalone dataset DOIs to look up
 #' @param meta (list) List object, output from get_meta_for_all_items_in_scope. Used in debugging case where you don't want to get the metadata from the scope every time this function is called, which can be a lengthy process.
-#' @param remove_preprints (logical) TRUE/FALSE on whether to remove published preprints. Defaults to FALSE.
 #'
 #' @return (data.frame) Table of datasets and DOIs that cite them
 #' @export
 #'
 #' @examples
-create_citation_table <- function(scope, file = NULL, standalone_dois = NULL, meta= NULL, remove_preprints = FALSE) {
+create_citation_table <- function(scope, file = NULL, standalone_dois = NULL, meta= NULL) {
   cols <- c('scope', 'id',
             'revision',
             'pubdate',
@@ -25,9 +24,9 @@ create_citation_table <- function(scope, file = NULL, standalone_dois = NULL, me
   for (i in seq_along(meta)) {
     for (item in meta[[i]]) {
       message(paste0('Getting citations for ', scope, '.', i, '.', item$revision, ' ...'))
-      citations <- get_citations_for_doi(doi = item$doi, remove_preprints = remove_preprints)
-      for (j in seq_along(citations)) {
-        df[nrow(df) + 1, ] <- c(scope, i, item$revision, item$pubDate, item$title, item$creator, item$doi, citations[[j]]$citation)
+      citations <- get_citations_for_doi(item$doi)
+      for (citation in seq_along(citations)) {
+        df[nrow(df) + 1, ] <- c(scope, i, item$revision, item$pubDate, item$title, item$creator, item$doi, citations[[citation]]$identifier)
       }
     }
   }
