@@ -1,6 +1,4 @@
-# retrieve citations from datacite REST API
-
-#' Title
+#' retrieve citations from datacite REST API
 #'
 #' @param relationship_child
 #' @param citation_type
@@ -20,20 +18,22 @@ add_citations_from_relationships <-
       # this is a df too instead of a list
       # so this deviates a bit from the python
       df <- relationship_child$data
-      if (class(df) != "data.frame") df <- as.data.frame(df)
+      if (class(df) != "data.frame")
+        df <- as.data.frame(df)
       for (row in seq_len(nrow(df))) {
         if ('id' %in% colnames(df)) {
           # make sure we dont already have this citation by checking the identifier
           found <- FALSE
           identifier <- clean_identifier(df[row, 'id'])
-          for (citation in citations_list) {
-            if (citation$identifier == identifier) {
+          for (citation in seq_along(citations_list)) {
+            if (is.na(citations_list[[citation]]$identifier) |
+                citations_list[[citation]]$identifier == identifier) {
               found <- TRUE
-              break()
+              break
             }
           }
           if (found)
-            next()
+            next
 
           citation <- list()
           citation$identifier <- identifier
@@ -74,11 +74,14 @@ get_citations_for_doi <- function(doi) {
   doi <- clean_identifier(doi)
   citations <- c()
   url <- paste0('https://api.datacite.org/dois/', doi)
-  tryCatch(expr = {
-    response <- jsonlite::fromJSON(url)
-  }, error = function(e){
-    message(paste0('DataCite API call failed for DOI: ', doi, 'Error: ', e))
-  })
+  tryCatch(
+    expr = {
+      response <- jsonlite::fromJSON(url)
+    },
+    error = function(e) {
+      message(paste0('DataCite API call failed for DOI: ', doi, 'Error: ', e))
+    }
+  )
 
 
   if (!is.null(response)) {
@@ -90,8 +93,10 @@ get_citations_for_doi <- function(doi) {
         if ('relatedIdentifiers' %in% names(response_json$data$attributes)) {
           # related identifiers is a data frame not a list
           # so this deviates from the python a little bit
-          relid_df <- response_json$data$attributes$relatedIdentifiers
-          if (class(relid_df) != "data.frame") relid_df <- as.data.frame(relid_df)
+          relid_df <-
+            response_json$data$attributes$relatedIdentifiers
+          if (class(relid_df) != "data.frame")
+            relid_df <- as.data.frame(relid_df)
           for (row in seq_len(nrow(relid_df))) {
             if ('relatedIdentifier' %in% colnames(relid_df)) {
               citation <- list()
@@ -118,37 +123,47 @@ get_citations_for_doi <- function(doi) {
       # get citations from references and citations within relationships
       if ('relationships' %in% names(response_json$data)) {
         if ('references' %in% names(response_json$data$relationships))
-          add_citations_from_relationships(relationship_child =  response_json$data$relationships$references,
-                                           citation_type = 'References',
-                                           citations_list =  citations,
-                                           clean_identifier = doi)
+          add_citations_from_relationships(
+            relationship_child =  response_json$data$relationships$references,
+            citation_type = 'References',
+            citations_list =  citations,
+            clean_identifier = doi
+          )
         if ('citations' %in% names(response_json$data$relationships))
-          add_citations_from_relationships(relationship_child =  response_json$data$relationships$citations,
-                                           citation_type = 'Citations',
-                                          citations_list =  citations,
-                                          clean_identifier = doi)
+          add_citations_from_relationships(
+            relationship_child =  response_json$data$relationships$citations,
+            citation_type = 'Citations',
+            citations_list =  citations,
+            clean_identifier = doi
+          )
       }
     }
 
     # for each citation, get the author, title, andyear to build citation text
-    for (citation in citations) {
-      citation$crossref_data <- NULL
-      if (citation$identifier_type == 'DOI') {
+    for (i in seq_along(citations)) {
+      if (toupper(citations[[i]]$identifier_type) == 'DOI' && !is.na(citations[[i]]$identifier)) {
         tryCatch({
-          crossref_citation <- get_citation_for_doi(citation$identifier)
-          citation$citation <- crossref_citation$citation
-          citation$preprints <- crossref_citation$preprints
+          crossref_citation <- get_citation_for_doi(citations[[i]]$identifier)
+          citations[[i]]$citation <- crossref_citation$citation
+          citations[[i]]$preprints <- crossref_citation$preprints
+          citations[[i]]$title <- crossref_citation$title
         },
         error = function(e) {
           message(e)
-          citation$citation <- ''
+          citations[[i]]$citation <- 'Citation not fetched'
+          citations[[i]]$title <- ''
         })
-      } else citation$citation <- ''
+      } else {
+        citations[[i]]$citation <- 'Citation not fetched'
+        citations[[i]]$title <- ''
+      }
+
     }
 
     # remove published preprints
     #citations <- remove_published_preprints(citations)
     #print(citations)
     return(citations)
-  } else stop()
+  } else
+    stop()
 }
