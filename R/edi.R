@@ -1,6 +1,6 @@
 #' Returns a dictionary of metadata for all packages in a given scope.
 #'
-#' @param scope (character) The scope of the package, e.g., knb-lter-ble
+#' @param scope (character) EDI scope, e.g., knb-lter-ble
 #'
 #' @return (list) A dictionary of metadata for all packages in the given scope, indexed by package
 #' @export
@@ -12,11 +12,35 @@ get_meta_for_all_items_in_scope <- function(scope) {
   message(paste('Found', length(ids), 'packages in scope', scope))
   for (id in ids) {
     meta_list <- c()
-    revisions <- EDIutils::list_data_package_revisions(scope = scope, identifier = id)
+    revisions <-
+      EDIutils::list_data_package_revisions(scope = scope, identifier = id)
     for (revision in revisions) {
-      message(paste0('Getting metadata for: ', scope, '.', id, '.', revision, '...'))
-      meta <- get_package_info(scope, id, revision)
-      meta_list[[as.character(revision)]] <- meta
+      message(paste0(
+        'Getting metadata for: ',
+        scope,
+        '.',
+        id,
+        '.',
+        revision,
+        '...'
+      ))
+      found <- TRUE
+      tryCatch(
+        expr = {
+          meta <- get_package_info(scope, id, revision)
+          meta_list[[as.character(revision)]] <- meta
+        },
+        error = function(e) {
+          message(paste(e, "\n Skipping this data package \n"))
+          found <- FALSE
+        }
+      )
+
+      # skip this iteration/revision if for any reason get_package_info didn't work
+      # for example, if public access is limited
+      if (!found) {
+        next
+      }
     }
     result[[as.character(id)]] <- meta_list
   }
@@ -47,7 +71,8 @@ get_package_info <- function(scope, id, revision) {
 
   creators <- meta$xml$dataset$creator
   creator_string <- ''
-  if (!is.null(names(creators))) creators <- list(creators)
+  if (!is.null(names(creators)))
+    creators <- list(creators)
   for (creator in creators)
     # If there is a surName, use it. Otherwise, use organizationName.
     if ('individualName' %in% names(creator)) {
@@ -57,7 +82,10 @@ get_package_info <- function(scope, id, revision) {
       creator_name <- creator$organizationName
       creator_string <- paste0(creator_string, creator_name, ', ')
     }
-  meta$creator <- substr(creator_string, start = 1, stop = nchar(creator_string) - 2)
+  meta$creator <-
+    substr(creator_string,
+           start = 1,
+           stop = nchar(creator_string) - 2)
 
   return(meta)
 }
