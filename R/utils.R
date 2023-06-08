@@ -1,13 +1,9 @@
-
-
-#' Title
+#' Reformat DOI to a standard format
 #'
-#' @param identifier
+#' @param identifier (character) DOI string
 #'
-#' @return
+#' @return (character) DOI string in standard format, e.g. 10.1029/2020gb006552. Without URL heads like "https://doi.org" or the "doi:" prefix.
 #' @export
-#'
-#' @examples
 clean_identifier <- function(identifier) {
   identifier <- trimws(sub(" ", "", identifier))
 

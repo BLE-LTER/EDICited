@@ -2,7 +2,7 @@
 % Please edit documentation in R/datacite.R
 \name{add_citations_from_relationships}
 \alias{add_citations_from_relationships}
-\title{Title}
+\title{retrieve citations from datacite REST API}
 \usage{
 add_citations_from_relationships(
   relationship_child,
@@ -12,11 +12,17 @@ add_citations_from_relationships(
 )
 }
 \arguments{
-\item{clean_identifier}{}
+\item{relationship_child}{(list)}
+
+\item{citation_type}{(character)}
+
+\item{citations_list}{(list)}
+
+\item{clean_identifier}{(character)}
 }
 \value{
 
 }
 \description{
-Title
+retrieve citations from datacite REST API
 }

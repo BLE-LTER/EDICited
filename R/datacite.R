@@ -1,14 +1,12 @@
 #' retrieve citations from datacite REST API
 #'
-#' @param relationship_child
-#' @param citation_type
-#' @param citations_list
-#' @param clean_identifier
+#' @param relationship_child (list)
+#' @param citation_type (character)
+#' @param citations_list (list)
+#' @param clean_identifier (character)
 #'
 #' @return
 #' @export
-#'
-#' @examples
 add_citations_from_relationships <-
   function(relationship_child,
            citation_type,
@@ -69,6 +67,13 @@ remove_published_preprints <- function(citations) {
   return(result)
 }
 
+#' Query the DataCite API for publications that have cited a given data DOI
+#'
+#' @param doi (character) Data package DOI, taken from EDI for example
+#'
+#' @return (list) Unnamed list of citations
+#' @export
+#'
 get_citations_for_doi <- function(doi) {
   # list of ciations, where each citation is a dictionary
   doi <- clean_identifier(doi)

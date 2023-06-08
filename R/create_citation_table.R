@@ -8,7 +8,6 @@
 #' @return (data.frame) Table of datasets and DOIs that cite them
 #' @export
 #'
-#' @examples
 create_citation_table <- function(scope, file = NULL, standalone_dois = NULL, meta= NULL) {
   cols <- c('scope', 'id',
             'revision',

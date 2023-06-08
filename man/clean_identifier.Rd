@@ -2,16 +2,16 @@
 % Please edit documentation in R/utils.R
 \name{clean_identifier}
 \alias{clean_identifier}
-\title{Title}
+\title{Reformat DOI to a standard format}
 \usage{
 clean_identifier(identifier)
 }
 \arguments{
-\item{identifier}{}
+\item{identifier}{(character) DOI string}
 }
 \value{
-
+(character) DOI string in standard format, e.g. 10.1029/2020gb006552. Without URL heads like "https://doi.org" or the "doi:" prefix.
 }
 \description{
-Title
+Reformat DOI to a standard format
 }

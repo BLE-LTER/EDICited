@@ -1,4 +1,4 @@
-EDICited is a R package that queries the DataCite API to look up citations of datasets from the Environmental Data Initiative (EDI).
+EDICited is a R package that queries the DataCite API to look up citations of datasets from the Environmental Data Initiative (EDI). This is the R version of the Python https://github.com/BLE-LTER/citations_for_data.
 
 # Installation
 `remotes::install_github("BLE-LTER/EDICited")`

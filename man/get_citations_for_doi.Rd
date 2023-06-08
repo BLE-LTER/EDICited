@@ -2,18 +2,16 @@
 % Please edit documentation in R/datacite.R
 \name{get_citations_for_doi}
 \alias{get_citations_for_doi}
-\title{Get DataCite citations for EDI data packages}
+\title{Query the DataCite API for publications that have cited a given data DOI}
 \usage{
-get_citations_for_doi(doi, remove_preprints = FALSE)
+get_citations_for_doi(doi)
 }
 \arguments{
-\item{doi}{(character) One DOI string from EDI data package to lookup citations for}
-
-\item{remove_preprints}{(logical) TRUE/FALSE on whether to remove published preprints. Defaults to FALSE.}
+\item{doi}{(character) Data package DOI, taken from EDI for example}
 }
 \value{
-(list) Unnamed list of citations found in DataCite
+(list) Unnamed list of citations
 }
 \description{
-Get DataCite citations for EDI data packages
+Query the DataCite API for publications that have cited a given data DOI
 }

@@ -1,11 +1,9 @@
-#' Title
+#' Query the CrossRef API to get the details of a publication
 #'
-#' @param doi
+#' @param doi (character) A publication's DOI
 #'
-#' @return
+#' @return (list) A list format with the citation, title, authors, and pubdate. These are empty strings if the API call is unsuccessful.
 #' @export
-#'
-#' @examples
 get_citation_for_doi <- function(doi) {
   url <- paste0('https://api.crossref.org/works/', doi)
   citation <- list()

@@ -7,7 +7,7 @@
 get_meta_for_all_items_in_scope(scope)
 }
 \arguments{
-\item{scope}{(character) The scope of the package, e.g., knb-lter-ble}
+\item{scope}{(character) EDI scope, e.g., knb-lter-ble}
 }
 \value{
 (list) A dictionary of metadata for all packages in the given scope, indexed by package
